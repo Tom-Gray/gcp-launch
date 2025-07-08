@@ -1,0 +1,91 @@
+package url
+
+import (
+	"fmt"
+	"os/exec"
+	"runtime"
+
+	"github.com/tom-gray/gcp-launch/config"
+)
+
+// GenerateServiceURL constructs the appropriate Google Cloud Console URL
+// based on the requested service type and environment configuration.
+// MODIFIED: Updated 'gke' case to use GenerateGKEURL if cluster is specified.
+func GenerateServiceURL(serviceType string, envConfig config.EnvironmentConfig) (string, error) {
+	if envConfig.ProjectID == "" {
+		return "", fmt.Errorf("cannot generate URL: project_id is missing for service type '%s'", serviceType)
+	}
+	const consoleBaseURL = "https://console.cloud.google.com"
+	var url string
+	switch serviceType {
+	case "logging":
+		url = fmt.Sprintf("%s/logs/viewer?project=%s", consoleBaseURL, envConfig.ProjectID)
+	case "cloudrun":
+		if envConfig.Region != "" {
+			url = GenerateCloudRunURL(envConfig.ProjectID, envConfig.Region)
+		} else {
+			url = fmt.Sprintf("%s/run?project=%s", consoleBaseURL, envConfig.ProjectID)
+		}
+	case "gke":
+		// Use the specific cluster details URL if cluster name is available
+		if envConfig.Cluster != "" {
+			url = GenerateGKEURL(envConfig.ProjectID, envConfig.Cluster) // Call the new function
+		} else {
+			// Fallback to the project-level cluster list
+			url = fmt.Sprintf("%s/kubernetes/list?project=%s", consoleBaseURL, envConfig.ProjectID)
+		}
+	case "spanner":
+		url = fmt.Sprintf("%s/spanner?project=%s", consoleBaseURL, envConfig.ProjectID)
+	default:
+		return "", fmt.Errorf("URL generation not supported for service type: '%s'", serviceType)
+	}
+	return url, nil
+}
+
+// GenerateCloudRunURL constructs the Google Cloud Console URL for Cloud Run services
+// within a specific project.
+// (This function remains unchanged)
+func GenerateCloudRunURL(projectID string, region string) string {
+	// Cloud Run URLs often include the region for more specific navigation.
+	// Format: https://console.cloud.google.com/run?project=<project_id>&region=<region>
+	const cloudRunURLFormat = "https://console.cloud.google.com/run?project=%s&region=%s"
+	url := fmt.Sprintf(cloudRunURLFormat, projectID, region)
+	return url
+}
+
+// GenerateGKEURL constructs the Google Cloud Console URL for a specific GKE cluster's details page.
+// It uses the format specified: https://console.cloud.google.com/kubernetes/clusters/details/{cluster}?project={project_id}
+// Note: The actual GKE console URL might also require region/zone, but this follows the provided specification.
+func GenerateGKEURL(projectID string, cluster string) string {
+	// Format based on the provided specification
+	const gkeURLFormat = "https://console.cloud.google.com/kubernetes/clusters/details/%s?project=%s"
+	// Substitute cluster name first, then project ID
+	url := fmt.Sprintf(gkeURLFormat, cluster, projectID)
+	return url
+}
+
+// OpenURL attempts to open the specified URL in the default web browser.
+// (This function remains unchanged)
+func OpenURL(url string) error {
+	var command string
+	var args []string
+	switch runtime.GOOS {
+	case "linux":
+		command = "xdg-open"
+		args = []string{url}
+	case "darwin":
+		command = "open"
+		args = []string{url}
+	case "windows":
+		command = "cmd"
+		args = []string{"/c", "start", url}
+	default:
+		return fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+	}
+	cmd := exec.Command(command, args...)
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("failed to open URL '%s' using command '%s %v': %w", url, command, args, err)
+	}
+	return nil
+}

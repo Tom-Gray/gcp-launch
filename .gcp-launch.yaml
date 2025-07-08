@@ -1,0 +1,23 @@
+services:
+  logging:
+    environments:
+      lightning-prod:
+        project_id: my-prod-project
+      lightning-dev:
+        project_id: my-dev-project
+  cloudrun:
+    environments:
+      lightning-prod:
+        project_id: my-prodk-project
+        region: us-central1
+  gke:
+    environments:
+      apps-prod:
+        project_id: my-prodk-project
+        region: us-central1
+  spanner:
+    environments:
+      prod:
+        project_id: my-spanner-prod-project
+      dev:
+        project_id: my-spanner-dev-project
