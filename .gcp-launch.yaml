@@ -1,13 +1,13 @@
 services:
   logging:
     environments:
-      lightning-prod:
+      myproject-prod:
         project_id: my-prod-project
-      lightning-dev:
+      myproject-dev:
         project_id: my-dev-project
   cloudrun:
     environments:
-      lightning-prod:
+      myproject-prod:
         project_id: my-prodk-project
         region: us-central1
   gke:

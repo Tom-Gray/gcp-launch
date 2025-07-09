@@ -43,16 +43,16 @@ You can also specify a custom path for the configuration file using the `--confi
 services:
   logging:
     environments:
-      lightning-prod:
+      myproject-prod:
         project_id: my-prod-project
-      lightning-dev:
+      myproject-dev:
         project_id: my-dev-project
   cloudrun:
     environments:
-      lightning-prod:
+      myproject-prod:
         project_id: my-prodk-project
         region: us-central1 # Region is important for Cloud Run URLs
-      lightning-dev:
+      myproject-dev:
         project_id: my-dev-project
         region: us-central1
   gke:
@@ -74,7 +74,7 @@ services:
 *   `services`: Top-level key containing definitions for different GCP services.
 *   `<service_name>`: (e.g., `logging`, `cloudrun`, `gke`) - The name of the GCP service.
 *   `environments`: Contains different deployment environments for a service.
-*   `<environment_name>`: (e.g., `lightning-prod`, `lightning-dev`) - The name of the environment.
+*   `<environment_name>`: (e.g., `myproject-prod`, `myproject-dev`) - The name of the environment.
 *   `project_id`: The GCP project ID associated with the environment.
 *   `region`: (Optional, but recommended for Cloud Run) The GCP region for the service.
 *   `cluster`: (Optional, but recommended for GKE) The GKE cluster name.
@@ -93,14 +93,14 @@ gcp-launch <service> <environment> [--config <path_to_config>]
 
 **Examples:**
 
-1.  **Open Cloud Logging for `lightning-prod`:**
+1.  **Open Cloud Logging for `myproject-prod`:**
     ```bash
-    gcp-launch logging lightning-prod
+    gcp-launch logging myproject-prod
     ```
 
-2.  **Open Cloud Run for `lightning-dev` in `us-central1`:**
+2.  **Open Cloud Run for `myproject-dev` in `us-central1`:**
     ```bash
-    gcp-launch cloudrun lightning-dev
+    gcp-launch cloudrun myproject-dev
     ```
     *(Note: The region is automatically used from the config for Cloud Run URLs)*
 
@@ -112,7 +112,7 @@ gcp-launch <service> <environment> [--config <path_to_config>]
 
 4.  **Using a custom configuration file:**
     ```bash
-    gcp-launch logging lightning-prod --config /path/to/my/custom-config.yaml
+    gcp-launch logging myproject-prod --config /path/to/my/custom-config.yaml
     ```
 
 #### Autocompletion
