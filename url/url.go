@@ -10,7 +10,6 @@ import (
 
 // GenerateServiceURL constructs the appropriate Google Cloud Console URL
 // based on the requested service type and environment configuration.
-// MODIFIED: Updated 'gke' case to use GenerateGKEURL if cluster is specified.
 func GenerateServiceURL(serviceType string, envConfig config.EnvironmentConfig) (string, error) {
 	if envConfig.ProjectID == "" {
 		return "", fmt.Errorf("cannot generate URL: project_id is missing for service type '%s'", serviceType)
@@ -44,7 +43,6 @@ func GenerateServiceURL(serviceType string, envConfig config.EnvironmentConfig) 
 
 // GenerateCloudRunURL constructs the Google Cloud Console URL for Cloud Run services
 // within a specific project.
-// (This function remains unchanged)
 func GenerateCloudRunURL(projectID string, region string) string {
 	// Cloud Run URLs often include the region for more specific navigation.
 	// Format: https://console.cloud.google.com/run?project=<project_id>&region=<region>
@@ -55,7 +53,6 @@ func GenerateCloudRunURL(projectID string, region string) string {
 
 // GenerateGKEURL constructs the Google Cloud Console URL for a specific GKE cluster's details page.
 // It uses the format specified: https://console.cloud.google.com/kubernetes/clusters/details/{cluster}?project={project_id}
-// Note: The actual GKE console URL might also require region/zone, but this follows the provided specification.
 func GenerateGKEURL(projectID string, cluster string) string {
 	// Format based on the provided specification
 	const gkeURLFormat = "https://console.cloud.google.com/kubernetes/clusters/details/%s?project=%s"
@@ -65,7 +62,6 @@ func GenerateGKEURL(projectID string, cluster string) string {
 }
 
 // OpenURL attempts to open the specified URL in the default web browser.
-// (This function remains unchanged)
 func OpenURL(url string) error {
 	var command string
 	var args []string

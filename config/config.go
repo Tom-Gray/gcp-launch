@@ -3,22 +3,19 @@ package config
 import (
 	"fmt"
 	"os"
-	"path/filepath" // Make sure this is imported
+	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
 
-// Config struct definition remains the same
 type Config struct {
 	Services map[string]ServiceTypeConfig `yaml:"services"`
 }
 
-// ServiceTypeConfig struct definition remains the same
 type ServiceTypeConfig struct {
 	Environments map[string]EnvironmentConfig `yaml:"environments"`
 }
 
-// EnvironmentConfig struct definition remains the same
 type EnvironmentConfig struct {
 	ProjectID string `yaml:"project_id"`
 	Region    string `yaml:"region,omitempty"`
@@ -27,7 +24,6 @@ type EnvironmentConfig struct {
 
 // LoadConfig reads and parses the YAML configuration file.
 // It takes a filepath argument but currently ignores it.
-// MODIFIED: It now looks for '.gcp-launch.yaml' in the same directory as the executable.
 func LoadConfig(filepathArgument string) (*Config, error) {
 	var configFilePath string
 
@@ -49,7 +45,6 @@ func LoadConfig(filepathArgument string) (*Config, error) {
 	}
 
 	fmt.Printf("Attempting to load configuration from: %s\n", configFilePath) // Updated debug message
-
 
 	// Read the entire content of the YAML file
 	yamlFile, err := os.ReadFile(configFilePath)

@@ -21,13 +21,11 @@ var rootCmd = &cobra.Command{
 for a specified service type and environment based on predefined configuration.
 
 Example: gcp-launch logging development`,
-	Args: cobra.RangeArgs(2, 3),
-	// MODIFIED: Use the renamed completion function
+	Args:              cobra.RangeArgs(2, 3),
 	ValidArgsFunction: contextualArgCompletion,
 	RunE:              executeLaunch,
 }
 
-// Execute function remains the same
 func Execute(cfg *config.Config) error {
 	loadedConfig = cfg
 	return rootCmd.Execute()
@@ -36,7 +34,6 @@ func Execute(cfg *config.Config) error {
 // contextualArgCompletion provides autocompletion suggestions for arguments.
 // It suggests service names for the first argument and environment names
 // (based on the first argument) for the second argument.
-// MODIFIED: Renamed and added logic for len(args) == 1.
 func contextualArgCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// Ensure config is loaded before attempting completion
 	if loadedConfig == nil {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
 	// "os"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -11,7 +12,6 @@ import (
 	"github.com/tom-gray/gcp-launch/url"
 )
 
-// Constants and Model struct definition remain the same...
 const (
 	stateSelectService     = "select_service"
 	stateSelectEnvironment = "select_environment"
@@ -29,7 +29,6 @@ type Model struct {
 	finalError        error
 }
 
-// NewModel and Init remain the same...
 func NewModel(cfg *config.Config) Model {
 	keys := []string{}
 	if cfg != nil && cfg.Services != nil {
@@ -54,7 +53,6 @@ func NewModel(cfg *config.Config) Model {
 func (m Model) Init() tea.Cmd { return nil }
 
 // Update handles messages and state transitions.
-// MODIFIED: Added specific logic for 'gke' on Enter in environment selection.
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if msg == nil {
 		return m, nil
@@ -166,7 +164,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, tea.Quit // Quit after attempting generation and opening
 				}
 			case "esc", "backspace":
-				// Go back logic (remains the same)
 				m.state = stateSelectService
 				m.selectedService = ""
 				m.environmentKeys = nil
@@ -177,7 +174,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// View and Accessor methods remain the same...
 func (m Model) View() string {
 	var sb strings.Builder
 	switch m.state {
