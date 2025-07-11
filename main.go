@@ -13,12 +13,10 @@ import (
 
 func main() {
 	var configPath string
+	var debugMode bool
 
-	// Define a flag for the config file path
+	// Parse command line arguments for config and debug flags
 	// This needs to be done before cobra.Command.Execute() is called
-	// as cobra parses flags before running the command.
-	// For now, we'll just check os.Args directly for a simple flag.
-	// A more robust solution would integrate with Cobra's flag parsing.
 	for i, arg := range os.Args {
 		if arg == "--config" && i+1 < len(os.Args) {
 			configPath = os.Args[i+1]
@@ -28,16 +26,43 @@ func main() {
 		}
 	}
 
+	// Check for debug flag (but don't remove it since cobra will handle it)
+	for _, arg := range os.Args {
+		if arg == "--debug" {
+			debugMode = true
+			break
+		}
+	}
+
+	// Check if we should run TUI mode (no service/environment arguments provided)
+	// Count non-flag arguments to determine if service and environment were provided
+	nonFlagArgs := 0
+	for _, arg := range os.Args[1:] { // Skip program name
+		if !strings.HasPrefix(arg, "--") {
+			nonFlagArgs++
+		}
+	}
+
+	if debugMode {
+		fmt.Printf("[DEBUG] Attempting to load configuration from: %s\n", func() string {
+			if configPath == "" {
+				return "default location"
+			}
+			return configPath
+		}())
+	}
+
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading configuration: %v\n", err)
 		os.Exit(1)
 	}
 
-	if len(os.Args) == 1 {
+	if nonFlagArgs == 0 {
 		// --- TUI Mode ---
-		// (TUI logic remains unchanged)
-		fmt.Println("No arguments provided, launching TUI...")
+		if debugMode {
+			fmt.Println("[DEBUG] No arguments provided, launching TUI...")
+		}
 		initialModel := tui.NewModel(cfg)
 		p := tea.NewProgram(initialModel, tea.WithAltScreen())
 		finalModel, err := p.Run()
@@ -56,7 +81,7 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error during TUI operation: %v\n", finalErr)
 				}
 			} else if finalURL != "" {
-				fmt.Println("Browser command executed for:", finalURL)
+				fmt.Println("Launching:", finalURL)
 			} else {
 				fmt.Println("TUI finished.")
 			}
@@ -66,7 +91,6 @@ func main() {
 		}
 	} else {
 		// --- CLI Mode ---
-		// MODIFIED: Execute the Cobra command structure
 
 		// Pass the loaded config to the command execution context
 		if err := cmd.Execute(cfg); err != nil {

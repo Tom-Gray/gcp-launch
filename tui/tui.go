@@ -138,8 +138,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						// Specific handling for GKE
 						projectID := envConf.ProjectID
 						cluster := envConf.Cluster
-						if projectID == "" || cluster == "" {
-							m.finalError = fmt.Errorf("project_id or cluster not defined in config for service '%s', environment '%s'", m.selectedService, selectedEnv)
+						if projectID == "" {
+							m.finalError = fmt.Errorf("project_id not defined in config for service '%s', environment '%s'", m.selectedService, selectedEnv)
 							return m, tea.Quit
 						}
 						serviceURL = url.GenerateGKEURL(projectID, cluster)

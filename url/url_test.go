@@ -32,7 +32,7 @@ func TestGenerateServiceURL(t *testing.T) {
 			name:        "gke service with cluster",
 			serviceType: "gke",
 			envConfig:   config.EnvironmentConfig{ProjectID: "test-project", Cluster: "test-cluster"},
-			expectedURL: "https://console.cloud.google.com/kubernetes/clusters/details/test-cluster?project=test-project",
+			expectedURL: "https://console.cloud.google.com/kubernetes/workload/overview?inv=1&invt=Ab2VWw&project=test-project",
 			expectError: false,
 		},
 		{
@@ -85,7 +85,7 @@ func TestGenerateCloudRunURL(t *testing.T) {
 func TestGenerateGKEURL(t *testing.T) {
 	projectID := "my-project"
 	cluster := "my-cluster"
-	expected := "https://console.cloud.google.com/kubernetes/clusters/details/my-cluster?project=my-project"
+	expected := "https://console.cloud.google.com/kubernetes/workload/overview?inv=1&invt=Ab2VWw&project=my-project"
 	actual := GenerateGKEURL(projectID, cluster)
 	if actual != expected {
 		t.Errorf("GenerateGKEURL(%s, %s) = %s; want %s", projectID, cluster, actual, expected)

@@ -12,6 +12,14 @@ import (
 )
 
 var loadedConfig *config.Config
+var debugMode bool
+
+// debugLog prints debug messages only when debug mode is enabled
+func debugLog(format string, args ...interface{}) {
+	if debugMode {
+		fmt.Printf("[DEBUG] "+format+"\n", args...)
+	}
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -24,6 +32,10 @@ Example: gcp-launch logging development`,
 	Args:              cobra.RangeArgs(2, 3),
 	ValidArgsFunction: contextualArgCompletion,
 	RunE:              executeLaunch,
+}
+
+func init() {
+	rootCmd.PersistentFlags().BoolVar(&debugMode, "debug", false, "Enable debug logging")
 }
 
 func Execute(cfg *config.Config) error {
@@ -93,7 +105,7 @@ func contextualArgCompletion(cmd *cobra.Command, args []string, toComplete strin
 func executeLaunch(cmd *cobra.Command, args []string) error {
 	service := args[0]
 	environment := args[1]
-	fmt.Printf("Service Type: %s, Environment: %s\n", service, environment)
+	debugLog("Service Type: %s, Environment: %s", service, environment)
 	serviceConfig, ok := loadedConfig.Services[service]
 	if !ok {
 		return fmt.Errorf("service type '%s' not found in configuration", service)
@@ -114,28 +126,29 @@ func executeLaunch(cmd *cobra.Command, args []string) error {
 		}
 		serviceURL = url.GenerateCloudRunURL(environmentConfig.ProjectID, configRegion)
 		genErr = nil
-		fmt.Printf("Found project ID: %s, Region: %s. Attempting to open Cloud Run...\n", environmentConfig.ProjectID, configRegion)
+		debugLog("Found project ID: %s, Region: %s. Attempting to open Cloud Run...", environmentConfig.ProjectID, configRegion)
 	} else if service == "gke" {
 		configCluster := environmentConfig.Cluster
-		if configCluster == "" {
-			return fmt.Errorf("cluster not defined in configuration for service '%s' in environment '%s'", service, environment)
-		}
 		serviceURL = url.GenerateGKEURL(environmentConfig.ProjectID, configCluster)
 		genErr = nil
-		fmt.Printf("Found project ID: %s, Cluster: %s. Attempting to open GKE Cluster details...\n", environmentConfig.ProjectID, configCluster)
+		if configCluster != "" {
+			debugLog("Found project ID: %s, Cluster: %s. Attempting to open GKE Workload overview...", environmentConfig.ProjectID, configCluster)
+		} else {
+			debugLog("Found project ID: %s. Attempting to open GKE Workload overview...", environmentConfig.ProjectID)
+		}
 	} else {
 		serviceURL, genErr = url.GenerateServiceURL(service, environmentConfig)
 		if genErr != nil {
 			return fmt.Errorf("failed to generate URL: %w", genErr)
 		}
-		fmt.Printf("Found project ID: %s. Attempting to open GCP console for %s...\n", environmentConfig.ProjectID, service)
+		debugLog("Found project ID: %s. Attempting to open GCP console for %s...", environmentConfig.ProjectID, service)
 	}
 	openErr := url.OpenURL(serviceURL)
 	if openErr != nil {
 		fmt.Fprintf(os.Stderr, "Warning: Failed to open URL '%s' in browser: %v\n", serviceURL, openErr)
 		fmt.Printf("You can manually access the URL here: %s\n", serviceURL)
 	} else {
-		fmt.Println("Browser should be opening the URL shortly.")
+		fmt.Printf("Launching: %v", serviceURL)
 	}
 	return nil
 }

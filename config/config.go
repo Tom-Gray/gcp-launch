@@ -44,8 +44,6 @@ func LoadConfig(filepathArgument string) (*Config, error) {
 		configFilePath = filepath.Join(execDir, ".gcp-launch.yaml")
 	}
 
-	fmt.Printf("Attempting to load configuration from: %s\n", configFilePath) // Updated debug message
-
 	// Read the entire content of the YAML file
 	yamlFile, err := os.ReadFile(configFilePath)
 	if err != nil {

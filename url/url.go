@@ -51,13 +51,13 @@ func GenerateCloudRunURL(projectID string, region string) string {
 	return url
 }
 
-// GenerateGKEURL constructs the Google Cloud Console URL for a specific GKE cluster's details page.
-// It uses the format specified: https://console.cloud.google.com/kubernetes/clusters/details/{cluster}?project={project_id}
+// GenerateGKEURL constructs the Google Cloud Console URL for the GKE workload overview page.
+// It uses the format: https://console.cloud.google.com/kubernetes/workload/overview?inv=1&invt=Ab2VWw&project={project_id}
 func GenerateGKEURL(projectID string, cluster string) string {
-	// Format based on the provided specification
-	const gkeURLFormat = "https://console.cloud.google.com/kubernetes/clusters/details/%s?project=%s"
-	// Substitute cluster name first, then project ID
-	url := fmt.Sprintf(gkeURLFormat, cluster, projectID)
+	// Format for workload overview page
+	const gkeURLFormat = "https://console.cloud.google.com/kubernetes/workload/overview?inv=1&invt=Ab2VWw&project=%s"
+	// Only use project ID for workload overview (cluster parameter is ignored for this URL format)
+	url := fmt.Sprintf(gkeURLFormat, projectID)
 	return url
 }
 
